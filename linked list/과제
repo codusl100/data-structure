@@ -77,7 +77,7 @@ public String toString() { //노드 아이템들을 string으로 변환하여 �
 //삽입
 public E addNode(E newItem) { //연결리스트 맨 앞에 새 노드 삽입
 	Node<E> newnode = new Node<E>(newItem); //새 노드 생성
-	if(newnode.getItem()!= null)
+	if(newnode.getItem()== null)
 		return null;
 	newnode.setItem(newItem); //newnode에 newItem 담아줌
 	if(size == 0) {
@@ -101,7 +101,7 @@ public E addNode(E newItem) { //연결리스트 맨 앞에 새 노드 삽입
 	return newItem;
 }
 public void deleteNode(E Item) { //리스트의 노드 삭제
-	Node<E> node = getNode(); //제거할 노드 가리키기 위해 node 노드 생성
+	Node<E> node = new Node(Item); //제거할 노드 가리키기 위해 node 노드 생성
 	 //node는 Item을 담음
 	if(node==null) //가리키는 노드가 없다면
 		head= node.getNext();
