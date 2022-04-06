@@ -1,0 +1,200 @@
+
+import java.util.Scanner;
+import java.util.NoSuchElementException;
+class Node<E>{ //노드 클래스
+	private E	    item; //노드 내부 담고 있는 item 변수
+	private Node<E> next; //다음 노드를 가리키는 레퍼런스 변수 (노드 자체를 가리키므로 Node<E> 타입 지정)
+	private Node<E> prev; //이전 노드를 가리키는 레퍼런스 변수 (노드 자체를 가리키므로 Node<E> 타입 지정)
+	public Node(E Item) {//생성자
+		this.item = Item;
+		this.next = null;
+		this.prev = null; //가리키는 노드 없이 null 처리
+	}
+	//get과 set 메소드들
+	public E	   getItem() {return item;}
+	public Node<E> getNext() {return next;}
+	public Node<E> getPrev() {return prev;}
+	public void    setItem(E newItem)		{ item = newItem; }
+	public void    setNext(Node<E> newNext) { next = newNext; }
+	public void	   setPrev(Node<E> newPrev) { prev = newPrev; }
+}
+
+//이중연결리스트로 구현한 DList 클래스
+class DList<E>{
+	private Node<E> head = new Node<E>(null); //연결 리스트 노드의 첫 부분
+	private Node<E> tail = new Node<E>(null); //연결 리스트 노드의 마지막 부분
+	private   int  size = 0; //담긴 노드 요소 개수
+	public DList() { //생성자
+		head.setPrev(tail); //맨 처음 노드 = head
+		tail.setNext(head); //맨 마지막 노드 = tail
+		this.size = 0; //이중연결리스트에 연결된 노드의 개수
+		//처음 리스트 생성시 아무런 데이터 없으므로 null, 0으로 초기화
+	}
+
+// 탐색, 삽입, 삭제 연산을 위한 메소드 선언
+//탐색 기능
+public int search(E target) { //target이 속한 index를 탐색
+	Node<E> p = head;
+	for (int k = 0; k < size ; k++) {
+		if(p.getItem() == target) return k;
+		p = p.getNext(); //다음 노드로
+	}
+	return -1; //탐색을 실패한 경우 -1 리턴	
+	}
+
+public Node<E> getNode(int index){ //해당 index의 target값 가져옴
+	Node<E> node;
+	if(index< size/2) { //중간 기준으로 앞 부분 탐색
+		node = head;
+		for(int i=0; i<index;i++) {
+			node = head.getNext();
+		}
+	}
+	else {
+		node = tail; //중간 이후부터 tail서부터 앞으로 탐색
+		for(int i=size-1;i>index;i--) {
+			node = node.getPrev();
+		}
+	}
+	return node;
+}
+
+//출력
+public String toString() { //노드 아이템들을 string으로 변환하여 출력
+	Node<E> node = head;
+	if(head == null) {
+		System.out.println("해당되는 노드가 없습니다");
+	}
+	String str="";
+	while(node.getNext()!=null) //다음 노드 없을 때까지
+	{
+		str += node.getItem() +" ";
+		node = node.getNext();
+	}
+	str += node.getItem();
+	return str + " ";
+}
+
+//삽입
+public void addFirst(E data) {
+	Node newNode = new Node(data); 
+	if (head != null) { 
+		// 기존 노드가 있음 
+		newNode.setNext(head); 
+		head.setPrev(newNode); 
+		} 
+		head = newNode; 
+		if (head.getNext() == null) 
+		{ 
+			tail = head; 
+			} 
+		size++; 
+	}
+
+public void addLast(E data) { 
+	if (size == 0) 
+	{ addFirst(data); } 
+	else { 
+		Node newNode = new Node(data); 
+		tail.setNext(newNode); 
+		newNode.setPrev(tail); 
+		tail = newNode; size++; 
+		} 
+}
+
+public void add(int index, E data) {
+	if (index == 0) 
+	{ addFirst(data); } 
+	else if (index == size - 1) 
+	{ addLast(data); } 
+	else { 
+		Node newNode = new Node(data); 
+		Node prevNode = getNode(index - 1); 
+		Node nextNode = prevNode.getNext(); // 추가된 노드의 전후 설정
+		newNode.setPrev(prevNode); 
+		newNode.setNext(nextNode); // 이전 노드의 전후 설정
+		prevNode.setNext(newNode); // 다음 노드의 전후 설정 
+		nextNode.setPrev(newNode); 
+		size++; 
+	}
+}
+
+
+//삭제
+public Object removeFirst() {
+	if(size == 0) { return null; } 
+	Node removeNode = head; 
+	head = null; 
+	head = removeNode.getNext(); 
+	head.setPrev(null); 
+	size--; 
+	return removeNode.getItem(); 
+	}
+
+public Object removeLast() { 
+		if(size == 0) 
+		{ return null; } 
+		Node removeNode = tail; 
+		tail = null; 
+		tail = removeNode.getPrev(); 
+		tail.setNext(null); 
+		size--; 
+		return removeNode.getItem(); 
+}
+
+public Object remove(int index) {
+			if(size == 0) 
+			{ return null; } 
+			if(index == 0) 
+			{ return removeFirst(); }
+			else if(index == size-1) 
+			{ return removeLast(); }
+			else 
+			{ Node removeNode = getNode(index); 
+			Node prevNode = removeNode.getPrev(); 
+			Node nextNode = removeNode.getNext(); // 이전 노드 전후 설정 
+			prevNode.setNext(nextNode); // 다음 노드 전후 설정 
+			nextNode.setPrev(prevNode); 
+			size--; 
+			return removeNode.getItem(); }
+			}
+		
+
+public boolean contains(E item) { //노드에 item 존재 여부 반환
+	return search(item)!=-1; //search시 -1이 안나오면 true
+}
+
+public int size() { //노드 사이즈 return 
+	return size;
+}
+
+}
+public class main1{
+	public static void main(String[] args) {
+		DList<String> Name = new DList<>();
+		DList<Integer> Num = new DList<>();
+		Scanner sc = new Scanner(System.in);
+		/*while(true) {
+			String name=sc.next(); 
+			if(name.equals("print")) break; //print입력시 while문 종료
+			Name.addNode(name); //Name 리스트에 입력받은 name 추가
+			
+			int number=sc.nextInt();
+			Num.addNode(number); //Num 리스트에 입력받은 number 추가
+			
+			for(int i=0;i<Name.size();i++) {
+			if(Name.contains(name))
+				Name.deleteNode(name);
+			
+			else if(Num.contains(number))
+				Num.deleteNode(number);
+			}
+			
+		}*/
+		Name.addNode("강호동");
+		Num.addNode(123);
+		System.out.println(Name.toString());
+		System.out.println(Num.toString());
+
+	}
+}
