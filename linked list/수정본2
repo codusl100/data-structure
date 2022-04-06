@@ -1,0 +1,106 @@
+import java.util.Scanner;
+import java.util.NoSuchElementException;
+class Node<E>{ //노드 클래스
+	private E	    item; //노드 내부 담고 있는 item 변수
+	private Node<E> next; //다음 노드를 가리키는 레퍼런스 변수 (노드 자체를 가리키므로 Node<E> 타입 지정)
+	private Node<E> prev; //이전 노드를 가리키는 레퍼런스 변수 (노드 자체를 가리키므로 Node<E> 타입 지정)
+	public Node(E Item, Node next, Node prev){//생성자
+		this.item = Item;
+		this.next = null;
+		this.prev = null; //가리키는 노드 없이 null 처리
+	}
+	//get과 set 메소드들
+	public E	   getItem() {return item;}
+	public Node<E> getNext() {return next;}
+	public Node<E> getPrev() {return prev;}
+	public void    setItem(E newItem)		{ item = newItem; }
+	public void    setNext(Node<E> newNext) { next = newNext; }
+	public void	   setPrev(Node<E> newPrev) { prev = newPrev; }
+}
+class DList <E> {
+	protected Node head;
+	protected Node tail;
+	protected int size;
+	
+	public DList() {
+		head = new Node(null,null,null);
+		tail = new Node(null,head,null); // tail의 이전노를 head로 만든다
+		size = 0;
+	}
+
+	// 삽입
+	// p가 가리키는 노드 앞에 삽입
+	public void addFirst(Node p, E newItem)
+	{
+		Node t = p.getPrev();
+		Node newNode = new Node(newItem,t,p);
+		newNode.setNext(t);
+		if(t != null) {
+			t.setPrev(newNode);
+		}
+		t= newNode;
+		size++;
+		if(t.getNext()== null) {
+			p = t;
+		}
+	}
+	
+	// p가 가리키는 노드 뒤에 삽입
+	public void addAfter(Node p, E newItem)
+	{
+		
+		Node t = p.getNext();
+		Node newNode = new Node(newItem,p,t);
+		if(size == 0 ) {
+			addFirst(newNode, newItem);
+		}
+		else {
+
+			t.setNext(newNode);
+			p.setPrev(newNode);
+			t = newNode;
+			size++;
+		}
+	}
+	
+	// 삭제
+	public void delete(Node x) // x가 가리키는 노드 삭제
+	{
+		if(x==null)  throw new NoSuchElementException();
+		
+		Node f = x.getPrev();
+		Node r = x.getNext();
+		
+		f.setNext(r);
+		r.setPrev(f);
+	}
+	// 출력
+	public String toString() {
+		Node node = head;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+
+		for (int i = 0; i < size - 1; i++) {
+			sb.append(node.getItem()).append(", ");
+			node = node.getNext();
+		}
+
+		sb.append(node.getItem());
+		node = node.getNext();
+
+		sb.append("]");
+
+		return sb.toString();
+	}
+}
+public class main{
+	public static void main(String[] args) {
+		DList<String> Name = new DList<>();
+		DList<Integer> Num = new DList<>();
+		Scanner sc = new Scanner(System.in);
+		Name.addFirst(Name.head, "강호동");
+		Name.toString();
+		
+	}
+}
