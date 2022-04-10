@@ -1,0 +1,146 @@
+import java.util.Scanner;
+import java.io.InputStreamReader;
+import java.util.EmptyStackException;
+class Stack<E>{
+	private E s[]; // 스택을 위한 배열
+	private int top; // 스택의 top 항목의 배열 원소 인덱스
+	private int size; // 스택의 사이즈
+	public Stack() { // 스택 생성자
+		s = (E[]) new Object[1]; //초기에 크기가 1인 배열 생성
+		top = -1;
+		size = 0;
+	}
+	public int size() {return top+1;} //스택에 있는 항목의 수를 리턴
+	public boolean isEmpty() {return (top == -1);}	//스택이 empty이면 true 리턴
+	//peak(), push(), pop(), resize() 메소드 선언
+
+
+public E peek() { //스택 top 항목만의 내용만을 리턴
+	if (isEmpty()) throw new EmptyStackException(); //underflow시 프로그램 정지
+	return s[top];
+}	
+
+public void push(E newItem) { // push 연산
+	if(size() == s.length)
+		resize(2*s.length); //스택을 2배의 크기로 확장
+	s[++top] = newItem; //새 항목을 push
+}
+
+public E pop() { // pop 연산
+	if(isEmpty()) throw new EmptyStackException(); //underflow시 프로그램 정지
+	E item = s[top];
+	s[top--] = null; //null로 초기화
+	if(size()>0 && size()==s.length/4)
+		resize(s.length/2); //스택을 1/2 크기로 축소
+	return item;
+}
+
+public void resize(int length) { //다시
+	  E b[] = (E[]) new Object[length];
+      for(int i=0; i<top+1; i++) 
+    	  {b[i] = s[i];
+    	  s = b;}
+}
+
+}
+
+public class main {
+	public static int order(char c) {//연산자 우선 순위 비교
+		switch(c) {
+			case '(':
+			case '{':
+				return 0;
+			case '+':
+			case '-':
+				return 1;
+			case '*':
+			case '/':
+				return 2;
+			default:
+				return -1;
+		}
+	}
+
+	public static int compare(char str1, char str2) {
+		int num1 = order(str1); // 현재 stack top
+		int num2 = order(str2); // 입력받은 값
+		
+		// 현재 우선순위가 더 높은 경우
+	    if (num1 > num2){
+	        return 1;
+	    }
+	    // 우선순위가 같은 경우
+	    else if (num1 == num2){
+	        return 0;
+	    }
+	    // 입력받은 str 우선순위가 더 높은 경우
+	    else {
+	        return -1;
+	    }
+	}
+
+	
+	public static String convert(String exp) {
+		Stack<Character> stack = new Stack<>();
+		StringBuilder sb = new StringBuilder(); //후위표기법을 통해 얻은 변수들 arr에 담
+	    String postFix = "";
+	    
+	    for (int i = 0; i < exp.length(); i++) {
+
+	        char ch = exp.charAt(i);
+	        if (Character.isLetter(ch)) {
+	        	sb.append(ch);
+	        } else {
+
+	           switch (ch) {
+	            case '(':
+	            case '{':
+	                stack.push(ch);
+	                break;
+	            case ')':
+	            case '}':
+	                while (true) {
+	                    char pop = stack.pop();
+	                    if (pop == '('||pop == '{')
+	                        {break;}
+	                    else {
+		                sb.append(ch);
+	                    }
+	                }
+	                break;
+	            case '+':
+	            case '-':
+	            case '*':
+	            case '/':
+	                while (!stack.isEmpty() && compare(stack.peek(), ch)>0)
+	                     sb.append(stack.pop());
+	                stack.push(ch);
+	                break;
+	            }
+
+	        }
+	    }
+
+	    while (!stack.isEmpty())
+	    	sb.append(stack.pop());
+
+	    return postFix;
+	}
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner sc = new Scanner(System.in);
+		Stack<Character> stack = new Stack<Character>();
+		System.out.print("문자열을 입력하시오: ");
+		String str=sc.next();
+		System.out.println(convert(str));
+		
+		//1.중위표기법 -> 후위표기법 변환
+	
+		
+		//2. 중위표기법을 후위표기법으로 계산*/
+
+	}
+	
+}
+
