@@ -1,0 +1,89 @@
+//1.중위표기법 -> 후위표기법 표기
+		for(int i=0;i<str.length();i++) {
+			char c = str.charAt(i); //c는 str문자열의 한 문자
+			if(Character.isLetter(c))
+				ans += c;
+			else if (stack.isEmpty()) {
+				stack.push(c); //스택이 비었을 경우 값 push함
+			}
+			else { //숫자 X && 스택 안 빈 경우
+				switch(c) {
+					case '(':
+					case '{':
+						stack.push(c); //왼쪽 괄호면 stack에 push
+						break;
+					
+					case ')':
+					case '}': //오른쪽 괄호라면
+						while(true) {
+							char pop = stack.pop();
+							if(pop=='('||pop=='{') { 
+								break; //왼쪽 괄호 나오면 그제서야 stop
+							}
+							else
+								ans += pop; // stack에서 pop하여 나온 값이 오른쪽 괄호가 아닐 때까지 ans에 문자를 더해준다.
+						}
+						break;
+					case '+':
+					case '-':
+					case '*':
+					case '/':
+						if(stack.isEmpty())
+							stack.push(c);
+						else
+							if(compare(stack.peek(), c)>0)
+								stack.push(c);
+							else {
+								while(!stack.isEmpty()) {
+									if(compare(stack.peek(), c)<=0) {
+										ans += stack.pop(); //stack의 상위 값 제거해서 ans에 더해준다.
+									}
+									else {
+										break;
+										}
+							}
+								stack.push(c);
+						break;
+			}
+		}
+		}
+		}
+		char check = ' ';
+        while(!stack.isEmpty()) {
+            check = (char) stack.pop();
+            if (check != '(') {
+                ans+=check;
+            }
+        }
+        
+		 System.out.println(ans);
+		 
+			
+		//2.중위표기법 -> 후위표기법 계산
+			
+		/*Stack<Character> newstack = new Stack<Character>();
+		System.out.print("문자열을 입력하시오: ");
+		String newstr = sc.next();
+		char newc =' ';
+		int sum=0;
+		
+		for(int i=0;i<newstr.length();i++) {
+			newc = newstr.charAt(i);
+			int num1, num2;
+			if(Character.isDigit(newc)) {
+				sum += (int)newc; //정수면 더해주기
+			switch(newc) {
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+							
+			}
+				
+			
+			}
+
+		}*/
+		
+}
+}
