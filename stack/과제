@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.util.EmptyStackException;
 class Stack<E>{
 	private E s[]; // 스택을 위한 배열
-	private int top; // 스택의 top 항목의 배열 원소 인덱스
+	int top; // 스택의 top 항목의 배열 원소 인덱스
 	private int size; // 스택의 사이즈
 	public Stack() { // 스택 생성자
 		s = (E[]) new Object[1]; //초기에 크기가 1인 배열 생성
@@ -82,7 +82,6 @@ public class main {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
 		Stack<Character> stack = new Stack<Character>();
-		StringBuilder sb = new StringBuilder();
 		System.out.print("문자열을 입력하시오: ");
 		String str = sc.next();
 		String ans = ""; //최종 후위표기법 문자열
@@ -90,38 +89,81 @@ public class main {
 		//1.중위표기법 -> 후위표기법 표기
 		for(int i=0;i<str.length();i++) {
 			char c = str.charAt(i); //c는 str문자열의 한 문자
-			if(Character.isLetter(c)) //c가 영문자라면
-				ans += c; //ans에 바로 c push
+			if(Character.isAlphabetic(c)) //c가 영문자라면
+				{ans += c;} //ans에 바로 c push
+			
 			else if(c=='+'||c=='-'||c=='*'||c=='/') { //입력받은 값이 연산자라면
 				if(stack.isEmpty())
 					stack.push(c);
-				else if(!stack.isEmpty() && (compare(stack.peek(),c)>=0)) {
+				else if(!stack.isEmpty() && (compare(stack.peek(),c)>0)) {
 				//stack이 비지 않고, stack의 상위 값이 우선순위 연산자라면
-					ans+=stack.pop();
-					stack.push(c);
+					while(true) {
+						if((compare((char)stack.top,c)<=0)) {
+							stack.push(c);
+							break;
+						}
+						ans+=stack.pop();
+					}
+					
 				}
-				else if(!stack.isEmpty()&& (compare(stack.peek(),c))<0) {
+				else if(!stack.isEmpty()&& (compare(stack.peek(),c))<=0) {
 					stack.push(c);
 						}
-						
-				
-				
+			
 			else if(c=='('||c=='{') { //입력받은 값이 열린 괄호라면
 				stack.push(c);
 			}
 			else if(c==')'||c=='}') { //입력받은 값이 닫힌 괄호라면
-				char pop = stack.pop();
-				while(pop!='('||pop!='{') { //열린 괄호가 안나올때까지
-					ans+=pop;
-					pop=stack.pop();	
+				while(stack.top!='('||stack.top!='{') { //열린 괄호가 안나올때까지
+					ans+=stack.pop();
 				}
+				 stack.pop();
 			}
+			
+			System.out.println(ans);
+		System.out.println(stack.top);
 			}
 		}
 		//남은 연산자 출력
 		while(!stack.isEmpty()) {
 			ans+=stack.pop();
 		}
+		
 		System.out.println(ans);
+		//2.중위표기법 -> 후위표기법 계산
+		Stack<Double> cal = new Stack<Double>();
+		System.out.print("계산식을 입력하시오: ");
+		String newstr = sc.next();
+		char sum = ' ';
+		double num1 = 0;
+		double num2 = 0;
+		
+		/*for(int i=0;i<newstr.length();i++) {
+			char k = newstr.charAt(i);
+			
+			if(Character.isDigit(k)) {
+				cal.push((double)k); //수라면 스택 cal에 더해준다
+			}
+			else { //연산자라면
+				num1 = Double.valueOf(stack.pop());
+				num2 = Double.valueOf(stack.pop());
+				
+				switch(k) {
+				case '+':
+					cal.push(num1+num2);
+					break;
+				case '-':
+					cal.push(num1-num2);
+					break;
+				case '*':
+					cal.push(num1*num2);
+					break;
+				case '/':
+					cal.push(num1/num2);
+					break;
+				}
+			}
+		}
+		System.out.println(sum);*/
 }
 }
