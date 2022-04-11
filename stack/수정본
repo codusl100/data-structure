@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.io.InputStreamReader;
+import java.lang.StringBuilder;
 import java.util.EmptyStackException;
 class Stack<E>{
 	private E s[]; // 스택을 위한 배열
@@ -42,117 +42,65 @@ public void resize(int length) { //다시
     	  s = b;}
 }
 
-public static int order(char c) {//연산자 우선 순위 비교
-	switch(c) {
-		case '(':
-		case '{':
-			return 0;
-		case '+':
-		case '-':
-			return 1;
-		case '*':
-		case '/':
-			return 2;
-		default:
-			return -1;
-	}
-}
-
-public static int compare(char str1, char str2) {
-	int num1 = order(str1); // 현재 stack top
-	int num2 = order(str2); // 입력받은 값
-	
-	// 현재 우선순위가 더 높은 경우
-    if (num1 > num2){
-        return 1;
-    }
-    // 우선순위가 같은 경우
-    else if (num1 == num2){
-        return 0;
-    }
-    // 입력받은 str 우선순위가 더 높은 경우
-    else {
-        return -1;
-    }
-}
 
 }
 
 public class main {
+	public static int order(char c) {//연산자 우선 순위 비교
+		switch(c) {
+			case '+':
+			case '-':
+				return 1;
+			case '*':
+			case '/':
+				return 2;
+			default:
+				return 0;
+		}
+	}
+
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
 		Stack<Character> stack = new Stack<Character>();
-		StringBuilder sb = new StringBuilder(); //후위표기법을 통해 얻은 변수들 arr에 담음
-		String str=sc.next();
-		char c = ' ';
+		System.out.print("문자열을 입력하시오: ");
+		String str = sc.next();
+		String ans = ""; //최종 후위표기법 문자열
 		
-		//1.중위표기법 -> 후위표기법 변환
-		for(int i=0;i<str.length();i++) { //stack 사이즈 동안
-			c = str.charAt(i);
-			//문자 (A, B, C ...)라면
-			if(Character.isLetter(c)) {
-				sb.append(c);
-			}
-			//아니라면
-			//연산자 스택이 비어있을 경우 push
-			else if (stack.isEmpty()) {
+		//1.중위표기법 -> 후위표기법 표기
+		for(int i=0;i<str.length();i++) {
+			char c = str.charAt(i); //c는 str문자열의 한 문자
+			if('A'<=c&&c>='Z') //c가 영문자라면
+				{ans += c;} //ans에 바로 c push
+			else{ //문자가 아니라면
+				if(c=='('||c=='{') { //입력받은 값이 열린 괄호라면
 				stack.push(c);
 			}
-			//연산자 스택 비어있지 않은 경우 
-			else { //왼쪽 괄호라면
-				if(c=='('||c=='{') {
-					stack.push(c);
-					continue; //다음 문자로
+			else if(c==')'||c=='}') { //입력받은 값이 닫힌 괄호라면
+				while(!stack.isEmpty()) { //열린 괄호가 안나올때까지
+					char pop = stack.pop();
+					if(pop=='(')
+						break;
+					ans+=pop; //괄호가 아니면 연산자를 꺼내어 문자열에 담는다.
 				}
-				//닫는 괄호가 나온 경우
-				//스택에 저장된 모든 연산자를 반환
-				else if (c==')'||c=='}') {
-					Character check = ' ';
-					while(true) {
-						check = (char)stack.pop();
-						if(check == '('|| check =='{') {
-							break;
-						}
-						else {
-						sb.append(check);
-						}
-						}
-					continue;
-				}
-				//현재 연산자의 우선순위가 더 높은 경우
-				//스택에 연산자 저장
-				else if(stack.compare((char)stack.peek(),c)>0) {
-					stack.push(c);
-				}
-				//현재 연산자의 우선순위가 더 낮거나 같은 경우
-				//스택에 있는 우선순위가 높은 연산자를 빼서 표현
-				else {
-					while(!stack.isEmpty()) {
-						if(stack.compare(stack.peek(), c)<=0) {
-							sb.append(stack.pop());
-						}
-						else {
-							break;
-						}
+			}
+			else { //입력받은 값이 연산자라면
+					while(!stack.isEmpty()&&order(stack.peek())>=order(c)) {
+						ans += stack.pop();
 					}
 					stack.push(c);
 				}
 			}
-	}
-		  char check = ' ';
-	        while(!stack.isEmpty()) {
-	            check = (char) stack.pop();
-	            if (check != '(') {
-	                sb.append(check);
-	            }
-	        }
-		System.out.println(sb.toString());
-	
+		}
+			//남은 연산자 출력
+			while(!stack.isEmpty()) {
+				ans+=stack.pop();
+			}
+			System.out.println(ans);
+				
 		
-		//2. 중위표기법을 후위표기법으로 계산*/
-
-	}
 	
+  }
+ 
+ //2.중위표기법 -> 후위표기법 계산
+		
 }
-
