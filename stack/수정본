@@ -3,7 +3,7 @@ import java.lang.StringBuilder;
 import java.util.EmptyStackException;
 class Stack<E>{
 	private E s[]; // 스택을 위한 배열
-	private int top; // 스택의 top 항목의 배열 원소 인덱스
+	int top; // 스택의 top 항목의 배열 원소 인덱스
 	private int size; // 스택의 사이즈
 	public Stack() { // 스택 생성자
 		s = (E[]) new Object[1]; //초기에 크기가 1인 배열 생성
@@ -16,7 +16,8 @@ class Stack<E>{
 
 
 public E peek() { //스택 top 항목만의 내용만을 리턴
-	if (isEmpty()) throw new EmptyStackException(); //underflow시 프로그램 정지
+	if (isEmpty())
+		return null; //비었다면 null 처리
 	return s[top];
 }	
 
@@ -48,59 +49,96 @@ public void resize(int length) { //다시
 public class main {
 	public static int order(char c) {//연산자 우선 순위 비교
 		switch(c) {
+			case '(':
+			case '{':
+				return 1;
 			case '+':
 			case '-':
-				return 1;
-			case '*':
-			case '/':
-				return 2;
+				return 3;
 			default:
-				return 0;
+				return 5;
 		}
 	}
 
+	
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		Stack<Character> stack = new Stack<Character>();
-		System.out.print("문자열을 입력하시오: ");
-		String str = sc.next();
-		String ans = ""; //최종 후위표기법 문자열
-		
-		//1.중위표기법 -> 후위표기법 표기
-		for(int i=0;i<str.length();i++) {
-			char c = str.charAt(i); //c는 str문자열의 한 문자
-			if('A'<=c&&c>='Z') //c가 영문자라면
-				{ans += c;} //ans에 바로 c push
-			else{ //문자가 아니라면
-				if(c=='('||c=='{') { //입력받은 값이 열린 괄호라면
-				stack.push(c);
-			}
-			else if(c==')'||c=='}') { //입력받은 값이 닫힌 괄호라면
-				while(!stack.isEmpty()) { //열린 괄호가 안나올때까지
-					char pop = stack.pop();
-					if(pop=='(')
-						break;
-					ans+=pop; //괄호가 아니면 연산자를 꺼내어 문자열에 담는다.
-				}
-			}
-			else { //입력받은 값이 연산자라면
-					while(!stack.isEmpty()&&order(stack.peek())>=order(c)) {
-						ans += stack.pop();
-					}
-					stack.push(c);
-				}
-			}
-		}
-			//남은 연산자 출력
-			while(!stack.isEmpty()) {
-				ans+=stack.pop();
-			}
-			System.out.println(ans);
-				
-		
-	
-  }
- 
+        Stack<Character> stack = new Stack<>();
+        String sum = ""; //출력할 문자열
+        String str = sc.next();
+       
+        
+        for (int i=0;i<str.length();i++) {  
+        	char c = str.charAt(i); //입력받은 문자
+        	//입력받은 c가 영문자면
+        	if(Character.isAlphabetic(c)) {
+        		sum+=c; //후위표기식 sum에 바로 추가
+        	}
+        	//stack이 비었다면
+        	else if(stack.isEmpty()) {
+        		stack.push(c);
+        	}
+        	//입력받은 c가 열린 괄호라면
+        	else if(c == '(' || c == '{') {
+        		stack.push(c);
+        	}
+        	//입력받은 c가 닫힌 괄호 혹은 연산자인 경우
+        	else {
+        		//닫힌 괄호라면
+        		if(c == ')' || c == '}') {
+        			while(!stack.isEmpty()) { //stack이 빌 때까지
+        				char pop = stack.pop();
+        				if(pop == '(' || pop == '{')  
+        					{break;} //열린 괄호 나올때까지 
+        				else sum += pop; //stack pop값을 후위계산식에 더해준다
+        			}
+        		}
+        		//입력받은 연산자가 *나 /이면
+        		else if(c == '*'||c == '/'){
+        			if(stack.isEmpty()) stack.push(c); //stack 비어있을 경우 c 추가
+        			else if(order(stack.peek())< order(c)) {
+        				stack.push(c); //입력한 c와 우선순위를 비교하여 c보다 작으면 stack에 묵혀둠
+        			}
+        			else { //입력한 c와 우선순위를 비교하여 c보다 크다면
+        				while(!stack.isEmpty() && order(stack.peek())>=order(c)) {
+        					sum += stack.pop(); //stack의 상위값을 제거해서 후위표기식에 입력함
+        					//if(stack.peek()==null) {break;} //stack.peek값이 null이라면 탈출
+        				}
+        				//stack이 다 비었다면 우선순위가 낮은 c를 stack에 넣어줌
+        				stack.push(c);
+        			}
+        		
+        		}
+        		else { //나머지 연산자
+        				if (c == ')' || c == '}') { // 닫힘 괄호면
+        	                while (!stack.isEmpty()) { //stack이 비지 않을 때까지
+        	                	char pop = stack.pop();
+        						if(pop=='('||pop=='{') // 열림 괄호라면 while문 종료
+        							break;
+        						sum+=pop; // 아니면 연산자를 꺼내어 문자열에 담는다.
+        	                }
+        	            }
+        				else if(order(stack.peek())>=order(c)) {
+        				//입력한 c가 열린 괄호가 아니고 stack 상위값의 우선순위가 c의 우선순위보다 같거나 클 때
+        				while(!stack.isEmpty()&&(order(stack.peek())>=order(c))){ //stack이 비지 않고, stack의 우선순위가 더 높아질 때까지
+        					sum += stack.pop();
+        				} //stack 최상위값을 후위표기식에 더해준다.
+        				stack.push(c);
+        				//while문 조건 끝나면 stack에 입력받은 c를 더해준다.
+        				}
+        				else //stack의 우선순위가 더 작을 때
+        					stack.push(c);
+        		}
+        	}
+        	System.out.println("후위표기식: "+sum);
+        	System.out.println("현재 stack top: "+stack.peek());
+        } 	//)를 삽입하고 stack에 담겨져있는게 다 꺼내져와야하는데 *가 안나오고 null처리가 됩니다..
+        	 while (!stack.isEmpty()) { // stack에 남아 있는 것들 후위표기식 sum에 추가하기
+                 sum+=stack.pop(); 	
+            }
+
  //2.중위표기법 -> 후위표기법 계산
-		
+
+        
+}
 }
