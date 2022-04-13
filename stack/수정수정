@@ -1,0 +1,104 @@
+import java.util.Scanner;
+import java.lang.StringBuilder;
+import java.util.EmptyStackException;
+class Stack<E>{
+	private E s[]; // 스택을 위한 배열
+	private int top; // 스택의 top 항목의 배열 원소 인덱스
+	private int size; // 스택의 사이즈
+	public Stack() { // 스택 생성자
+		s = (E[]) new Object[1]; //초기에 크기가 1인 배열 생성
+		top = -1;
+		size = 0;
+	}
+	public int size() {return top+1;} //스택에 있는 항목의 수를 리턴
+	public boolean isEmpty() {return (top == -1);}	//스택이 empty이면 true 리턴
+	//peak(), push(), pop(), resize() 메소드 선언
+
+
+public E peek() { //스택 top 항목만의 내용만을 리턴
+	/*if (isEmpty()) 
+		throw new EmptyStackException(); //underflow시 프로그램 정지
+	return s[top];*/
+	int len = size();
+	if( len <= 0 ) return null;
+	return s[len - 1];
+}	
+
+public void push(E newItem) { // push 연산
+	if(size() == s.length)
+		resize(2*s.length); //스택을 2배의 크기로 확장
+	s[++top] = newItem; //새 항목을 push
+}
+
+public E pop() { // pop 연산
+	if(isEmpty()) throw new EmptyStackException(); //underflow시 프로그램 정지
+	E item = s[top];
+	s[top--] = null; //null로 초기화
+	if(size()>0 && size()==s.length/4)
+		resize(s.length/2); //스택을 1/2 크기로 축소
+	return item;
+}
+
+public void resize(int length) { //다시
+	  E b[] = (E[]) new Object[length];
+      for(int i=0; i<top+1; i++) 
+    	  {b[i] = s[i];
+    	  s = b;}
+}
+
+
+}
+
+public class main {
+	public static int order(char c) {//연산자 우선 순위 비교
+		switch(c) {
+			case '(':
+			case '{':
+				return 0;
+			case '+':
+			case '-':
+				return 1;
+			default:
+				return 2;
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+        Stack<Character> stack = new Stack<>();
+        String sum = ""; //출력할 문자열
+        String str = sc.next();
+        char c = ' '; //입력받은 문자
+        for (int i=0;i<str.length();i++) {  
+        	c = str.charAt(i);
+            if (c >= 'A' && c <= 'Z')  // 입력받은 문자가 영문자면
+                sum+=c; // 출력 문자열에 추가
+            else { //문자가 영문자가 아니라면
+            	if (c == '(' || c == '{')  // 열림 괄호면
+                stack.push(c); //stack에 push
+            else if (c == ')' || c == '}') { // 닫힘 괄호면
+                while (!stack.isEmpty()&& stack.peek()!='('||stack.peek()!='{') {
+                	sum+=stack.pop(); // stack top이 왼쪽 괄호 아니면 문자열에 stack 값 pop해서 추가
+                }
+                if(!stack.isEmpty()) //stack 비어있지 않다면
+					stack.pop(); //왼쪽 괄호 제거
+            } else { // (연산자) stack top 부분과 우선순위 비교 --> c의 우선순위 높은 경우 stop
+                while (!stack.isEmpty() && order(stack.peek()) >= order(c)) 
+                    sum+=stack.pop();
+                // 4번 스택안에 들어간 ' ( ' 우선순위가 가장 낮기 때문에 push만 반복
+                stack.push(c);
+             }   
+
+            }
+            }
+        while (!stack.isEmpty()) { // 5번
+            sum+=stack.pop();
+        }
+
+        System.out.println(sum);
+
+ //2.중위표기법 -> 후위표기법 계산
+
+        
+}
+}
