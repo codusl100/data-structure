@@ -1,6 +1,6 @@
 import java.lang.Comparable;
 import java.util.Scanner;
-
+// 퀵 정렬 가운데
 class Quick{
 		Scanner sc = new Scanner(System.in);
 		public Integer[] init(int range) {
